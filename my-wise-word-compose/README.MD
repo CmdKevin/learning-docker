@@ -8,7 +8,7 @@ This is a result of my wise word compose project.
 ![Compose Container](./my-wise-word-compose_image/hasil_compose_container.PNG)
 
 ## Hasil Database PGadmin
-![PGadmin](./my-wise-word-compose_image/hasil_pgadmin.PNG)
+![PGadmin](./my-wise-word-compose_image/hasil_database_pgadmin.PNG)
 
 ## Hasil DockerPage/
 ![DockerPage/](./my-wise-word-compose_image/hasil_docker_pageslash.PNG)
