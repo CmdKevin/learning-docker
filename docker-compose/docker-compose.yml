@@ -1,0 +1,59 @@
+version: '3.9'
+# compose name
+name : docker-compose-learning
+
+# tell compose to create this all services
+services:
+  # app service section
+  app:
+    container_name: golang_container
+    environment:
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - DB_NAME=${DB_NAME}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+    env_file:
+      - .env
+    # build with given file
+    build:
+      context: ./my-dockerfile/
+      dockerfile: Dockerfile
+    depends_on:
+      postgresdb:
+        condition: service_healthy
+    # port to expose <HOST_PORT>:<CONTAINER_PORT>
+    ports:
+      - 80:80
+    # container network
+    networks:
+      - learning
+    
+  postgresdb:
+    image: postgres:latest
+    container_name: postgres_container
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASS}
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_HOST=${DB_HOST}
+    env_file:
+      - .env
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -d ${DB_NAME} -U ${DB_USER}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    ports:
+      - '5431:5432'
+    volumes:
+      - pg_data:/var/lib/postgressql/data
+    networks:
+      - learning
+
+volumes:
+  pg_data:
+
+networks:
+  learning:
+    driver: bridge

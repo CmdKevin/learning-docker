@@ -1,0 +1,59 @@
+version: '3.9'
+# compose name
+name : docker-compose-wise-word
+
+# tell compose to create this all services
+services:
+  # app service section
+  app:
+    container_name: go_service
+    environment:
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - DB_NAME=${DB_NAME}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+    env_file:
+      - .env
+    # build with given file
+    build:
+      context: ./my-dockerfile/
+      dockerfile: Dockerfile
+    depends_on:
+      postgresdb:
+        condition: service_healthy
+    # port to expose <HOST_PORT>:<CONTAINER_PORT>
+    ports:
+      - 9911:78
+    # container network
+    networks:
+      - netwwc
+    
+  postgresdb:
+    image: postgres:latest
+    container_name: database
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASS}
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_HOST=${DB_HOST}
+    env_file:
+      - .env
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -d ${DB_NAME} -U ${DB_USER}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    ports:
+      - '5430:5432'
+    volumes:
+      - volwwc:/var/lib/postgressql/data
+    networks:
+      - netwwc
+
+volumes:
+  volwwc:
+
+networks:
+  netwwc:
+    driver: bridge
