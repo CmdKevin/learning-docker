@@ -1,0 +1,59 @@
+version: '3.9'
+# compose name
+name : docker-mycompose
+
+# tell compose to create this all services
+services:
+  # app service section
+  app:
+    container_name: gosvc_service
+    environment:
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - DB_NAME=${DB_NAME}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+    env_file:
+      - .env
+    # build with given file
+    build:
+      context: ./go-compose/
+      dockerfile: Dockerfile
+    depends_on:
+      postgresdb:
+        condition: service_healthy
+    # port to expose <HOST_PORT>:<CONTAINER_PORT>
+    ports:
+      - 4331:78
+    # container network
+    networks:
+      - net_mycompose_kevin
+    
+  postgresdb:
+    image: postgres:latest
+    container_name: dbsvc_container
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASS}
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_HOST=${DB_HOST}
+    env_file:
+      - .env
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -d ${DB_NAME} -U ${DB_USER}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    ports:
+      - '5431:5432'
+    volumes:
+      - vol_mycompose_kevin:/var/lib/postgressql/data
+    networks:
+      - net_mycompose_kevin
+
+volumes:
+  vol_mycompose_kevin:
+
+networks:
+  net_mycompose_kevin:
+    driver: bridge
