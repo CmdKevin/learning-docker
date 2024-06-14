@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
@@ -38,25 +39,15 @@ func main() {
 		fmt.Println("To Infinity and Beyond!")
 	})
 
-	// Define a route for "/ping" to ping the database
-	router.GET("/ping", func(c *gin.Context) {
-		// Test ping to database
-		if err := db.Ping(); err != nil {
-			c.String(http.StatusInternalServerError, "Failed to ping database: %v", err)
-			return
-		}
-		c.String(http.StatusOK, "Pong!")
-	})
-
 	// Define a route to insert current timestamp into the database
-	router.GET("/insert-timestamp", func(c *gin.Context) {
+	router.GET("/ping", func(c *gin.Context) {
 		// Execute SQL query to insert current timestamp
-		_, err := db.Exec("INSERT INTO kevin_access_log (id, timestamp) VALUES (DEFAULT, NOW())")
+		_, err := db.Exec("INSERT INTO kevin_access_log (timestamp) VALUES ($1)", time.Now())
 		if err != nil {
 			c.String(http.StatusInternalServerError, "Failed to insert timestamp into database: %v", err)
 			return
 		}
-		c.String(http.StatusOK, "Timestamp inserted successfully")
+		c.String(http.StatusOK, "Pong!")
 	})
 
 	// Start the server on port 78

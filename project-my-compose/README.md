@@ -178,3 +178,6 @@ networks:
 
 3. Cek Root localhost/ping
 ![rootping](./project-my-compose-image/root_localhostping.PNG)
+
+4. Cek Table Sql
+![sql](./project-my-compose-image/hasil_ping_timestamp.PNG)
